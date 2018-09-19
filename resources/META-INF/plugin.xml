@@ -1,12 +1,10 @@
-<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
-
 <idea-plugin >
   <name>TabSwitcherExtreme</name>
   <version>1.0.5</version>
   <idea-version since-build="99.18"/>
 
   <description><![CDATA[
-    Open files quickly by organizing them in seperate lists.
+    Open files quickly by organizing them in separate lists.
     The lists are defined by going to [Settings|TabSwitcher Extreme] and specifying regex patters for their (full) filenames, e.g.
      <br><br>
     .*xml for files ending with .xml<br>
@@ -36,6 +34,9 @@
   ]]></change-notes>
 
   <vendor url="http://www.codestare.com" email="codestare@gmail.com">Codestare</vendor>
+
+  <depends>com.intellij.modules.lang</depends>
+
   <application-components>
     <component>
       <implementation-class>org.intellij.ideaplugins.tabswitcherextreme.Settings
@@ -48,14 +49,13 @@
         id="TabSwitcherExtreme.NextTab"
         class="org.intellij.ideaplugins.tabswitcherextreme.NextTabAction"
         text="Switch To Next Tab...">
-      <keyboard-shortcut first-keystroke="alt A" keymap="$default"/>
+      <keyboard-shortcut first-keystroke="ctrl E" keymap="$default"/>
     </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.Configuration"/>
+    <applicationConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.Configuration"/>
     <errorHandler implementation="nu.studer.idea.errorreporting.PluginErrorReportSubmitter"/>
   </extensions>
 
-  <depends>com.intellij.modules.lang</depends>
 </idea-plugin>
