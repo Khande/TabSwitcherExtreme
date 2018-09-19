@@ -55,7 +55,6 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.Configuration"/>
-    <errorHandler implementation="nu.studer.idea.errorreporting.PluginErrorReportSubmitter"/>
   </extensions>
 
 </idea-plugin>
