@@ -1,9 +1,6 @@
 package org.intellij.ideaplugins.tabswitcherextreme;
 
-import com.intellij.ide.actions.Switcher;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileEditor.impl.EditorHistoryManager;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
@@ -15,20 +12,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ui.UIUtil;
-
+import org.intellij.ideaplugins.tabswitcherextreme.config.TabGroupConfig;
+import org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.*;
+import java.util.List;
 
 public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
@@ -59,10 +52,10 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 		mProject = proj;
 
-		PropertiesComponent props = PropertiesComponent.getInstance();
-		String descriptions = props.getValue("Descriptions", "All (go to settings->Other Settings->TabSwitcher Extreme)");
-		String regexes = props.getValue("Regexes", ".*");
-		String removers = props.getValue("Removers", "");
+		TabGroupConfig config = TabSwitchExtremeConfigService.getInstance().getState();
+		String descriptions = config.getTitles();
+		String regexes = config.getMatches();
+		String removers = config.getExcludes();
 		Utils.log("Read descriptions: " + descriptions);
 		Utils.log("Read regexes: '" + regexes + "'");
 

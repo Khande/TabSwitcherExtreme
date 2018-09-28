@@ -1,9 +1,9 @@
-<idea-plugin >
-  <name>TabSwitcherExtreme</name>
-  <version>1.0.5</version>
-  <idea-version since-build="99.18"/>
+<idea-plugin>
+    <name>TabSwitcherExtreme</name>
+    <version>1.0.7</version>
+    <idea-version since-build="99.18"/>
 
-  <description><![CDATA[
+    <description><![CDATA[
     Open files quickly by organizing them in separate lists.
     The lists are defined by going to [Settings|TabSwitcher Extreme] and specifying regex patters for their (full) filenames, e.g.
      <br><br>
@@ -23,8 +23,8 @@
     <br>
     <br>Thanks to Bas Leijdekkers for <a href="https://github.com/BasLeijdekkers/TabSwitch">the original plugin (github)</a> this one is based off of.
     ]]>
-  </description>
-  <change-notes><![CDATA[
+    </description>
+    <change-notes><![CDATA[
     1.0.5: Fix jumping to editor that was dragged outside of main window
     1.0.4: Allow cycling through history with repeated keypressed. i.e. alt+a>a>a (or ctrl+tab>tab>tab). Without shift it cycles to older files, with shift to newer files.
     1.0.3: Allow filenames in lists to remove certain parts (extension, prefix, any regex will do)
@@ -33,28 +33,24 @@
     1.0: First release<br>
   ]]></change-notes>
 
-  <vendor url="http://www.codestare.com" email="codestare@gmail.com">Codestare</vendor>
+    <vendor>Khande</vendor>
 
-  <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-  <application-components>
-    <component>
-      <implementation-class>org.intellij.ideaplugins.tabswitcherextreme.Settings
-      </implementation-class>
-    </component>
-  </application-components>
+    <actions>
+        <action
+                id="TabSwitcherExtreme.NextTab"
+                class="org.intellij.ideaplugins.tabswitcherextreme.NextTabAction"
+                text="Switch To Next Tab...">
+            <keyboard-shortcut first-keystroke="ctrl E" keymap="$default"/>
+        </action>
+    </actions>
 
-  <actions>
-    <action
-        id="TabSwitcherExtreme.NextTab"
-        class="org.intellij.ideaplugins.tabswitcherextreme.NextTabAction"
-        text="Switch To Next Tab...">
-      <keyboard-shortcut first-keystroke="ctrl E" keymap="$default"/>
-    </action>
-  </actions>
-
-  <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.Configuration"/>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigUI"/>
+        <applicationService
+                serviceInterface="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService"
+                serviceImplementation="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService"/>
+    </extensions>
 
 </idea-plugin>
