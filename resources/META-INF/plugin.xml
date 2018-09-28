@@ -1,6 +1,6 @@
 <idea-plugin>
     <name>TabSwitcherExtreme</name>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <idea-version since-build="99.18"/>
 
     <description><![CDATA[
@@ -47,8 +47,8 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigUI"/>
-        <applicationService
+        <projectConfigurable instance="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigUI"/>
+        <projectService
                 serviceInterface="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService"
                 serviceImplementation="org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService"/>
     </extensions>

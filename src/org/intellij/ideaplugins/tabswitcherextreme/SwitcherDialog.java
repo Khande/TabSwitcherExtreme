@@ -32,7 +32,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 	private int trigger = 0;
 	private final BitSet modifiers = new BitSet();
-	Project mProject;
+	private Project myProject;
 	private ListManager mListManager;
 	public boolean proceed = true;
 	private VirtualFile[] mRecentFiles;
@@ -43,16 +43,16 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 
 
-	protected SwitcherDialog( @Nullable Project proj, KeyEvent event ) {
-		super(proj);
+	protected SwitcherDialog(@NotNull Project project, KeyEvent event ) {
+		super(project);
 
 		panel1.setBackground(UIUtil.getListBackground());
 		bottompanel.setBackground(UIUtil.getListBackground());
 		centerpanel.setBackground(UIUtil.getListBackground());
 
-		mProject = proj;
+		myProject = project;
 
-		TabGroupConfig config = TabSwitchExtremeConfigService.getInstance().getState();
+		TabGroupConfig config = TabSwitchExtremeConfigService.getInstance(myProject).getState();
 		String descriptions = config.getTitles();
 		String regexes = config.getMatches();
 		String removers = config.getExcludes();
@@ -68,7 +68,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 		int nrValids = Math.min(descList.length, regexList.length);
 
-		final List<VirtualFile> files = getFiles(mProject);
+		final List<VirtualFile> files = getFiles(myProject);
 		if (files.size() < 2) {
 			// no use!
 			Utils.log("QUIT!!!");
@@ -77,14 +77,14 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 			return;
 		}
 
-        LinkedHashSet<VirtualFile> recents = EditorHistoryManager.getInstance(proj).getFileSet();
+        LinkedHashSet<VirtualFile> recents = EditorHistoryManager.getInstance(project).getFileSet();
         List<VirtualFile> recentFilesArrayList = new ArrayList<VirtualFile>(recents.size());
         for (VirtualFile f : recents) {
             recentFilesArrayList.add(f);
         }
 
-        mListManager = new ListManager(mProject, recentFilesArrayList);
-//        mListManager = new ListManager(mProject, EditorHistoryManager.getInstance(proj).getFiles());
+        mListManager = new ListManager(myProject, recentFilesArrayList);
+//        mListManager = new ListManager(myProject, EditorHistoryManager.getInstance(project).getFiles());
 
 		for (int i = 0; i < nrValids; i++) {
 			String remover = null;
@@ -101,7 +101,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 		// find current file in the leftmost list
 		// todo: find previous file in the leftmost list
-		VirtualFile mostRecent = mostRecentFile(proj);
+		VirtualFile mostRecent = mostRecentFile(project);
 
 		ListManager.FilePosition initialPos = getListManager().getFilePosition(mostRecent);
 
@@ -261,16 +261,16 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 		close(0, true);
 
 		if (openFile) {
-			IdeFocusManager.getInstance(mProject).doWhenFocusSettlesDown(new Runnable() {
+			IdeFocusManager.getInstance(myProject).doWhenFocusSettlesDown(new Runnable() {
 				@Override
 				public void run() {
 					final FileEditorManagerImpl editorManager = (FileEditorManagerImpl) FileEditorManager
-							.getInstance(mProject);
+							.getInstance(myProject);
 					final VirtualFile file = getListManager().getSelectedFile();
 					if (file != null && file.isValid()) {
 
 						// figure out the window
-						FileInfo pair = new FileInfo(null, null, mProject);
+						FileInfo pair = new FileInfo(null, null, myProject);
 						for (Pair<VirtualFile, EditorWindow> looppair : editorManager.getSelectionHistory()) {
 							if (looppair.first.equals(file)) {
 								pair.first = looppair.first;

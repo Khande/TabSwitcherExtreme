@@ -2,6 +2,7 @@ package org.intellij.ideaplugins.tabswitcherextreme.config;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import org.intellij.ideaplugins.tabswitcherextreme.ConfigurationForm;
 import org.intellij.ideaplugins.tabswitcherextreme.Utils;
 import org.jetbrains.annotations.Nls;
@@ -15,9 +16,11 @@ public class TabSwitchExtremeConfigUI implements Configurable {
     @NotNull
     private final TabGroupConfig myTabGroupConfig;
 
-
-    public TabSwitchExtremeConfigUI() {
-        myTabGroupConfig = TabSwitchExtremeConfigService.getInstance().getState();
+    /**
+     * 当为 projectConfigurable 时构造器带上 project 参数
+     */
+    public TabSwitchExtremeConfigUI(@NotNull Project project) {
+        myTabGroupConfig = TabSwitchExtremeConfigService.getInstance(project).getState();
     }
 
     @Nls
