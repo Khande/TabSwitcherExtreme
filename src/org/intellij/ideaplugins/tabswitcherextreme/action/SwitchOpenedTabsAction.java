@@ -13,37 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.intellij.ideaplugins.tabswitcherextreme;
+package org.intellij.ideaplugins.tabswitcherextreme.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import org.intellij.ideaplugins.tabswitcherextreme.SwitcherDialog;
 
-import java.awt.event.KeyEvent;
-
-abstract class TabAction extends AnAction implements DumbAware {
+public class SwitchOpenedTabsAction extends BaseSwitchTabAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
-        final Project project = PlatformDataKeys.PROJECT.getData(event.getDataContext());
-        if ((project == null) || !(event.getInputEvent() instanceof KeyEvent)) {
+        final Project project = event.getProject();
+        if (project == null ) {
             return;
         }
-		SwitcherDialog dlg = new SwitcherDialog(project, (KeyEvent) event.getInputEvent());
+
+		SwitcherDialog dlg = new SwitcherDialog(project);
 		if (dlg.proceed) {
 			dlg.setTitle("Select File");
-			dlg.createCenterPanel();
 			dlg.show();
 		}
     }
 
-    @Override
-    public void update(AnActionEvent event) {
-        final DataContext dataContext = event.getDataContext();
-        final Project project = PlatformDataKeys.PROJECT.getData(dataContext);
-        event.getPresentation().setEnabled(project != null);
-    }
 }
