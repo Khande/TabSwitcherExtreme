@@ -24,15 +24,13 @@ public class SwitchOpenedTabsAction extends BaseSwitchTabAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
         final Project project = event.getProject();
+
         if (project == null ) {
             return;
         }
 
-		SwitcherDialog dlg = new SwitcherDialog(project);
-		if (dlg.proceed) {
-			dlg.setTitle("Select File");
-			dlg.show();
-		}
+		SwitcherDialog.show("Select File", project);
+
     }
 
 }

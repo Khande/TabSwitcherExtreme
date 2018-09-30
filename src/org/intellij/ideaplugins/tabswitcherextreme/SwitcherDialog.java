@@ -3,49 +3,42 @@ package org.intellij.ideaplugins.tabswitcherextreme;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
 import org.intellij.ideaplugins.tabswitcherextreme.config.TabGroupConfig;
 import org.intellij.ideaplugins.tabswitcherextreme.config.TabSwitchExtremeConfigService;
 import org.intellij.ideaplugins.tabswitcherextreme.utils.IJFileEditorUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
-public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
+public class SwitcherDialog extends JDialog implements KeyEventDispatcher{
 
 	private static final String CONFIG_DELIMITER = "\n";
 
-	private JPanel centerPanel;
-	private JLabel path;
-	private JPanel myCenterPanel;
-	private JPanel myBottomPanel;
+	private JLabel myFilePathLabel;
 
 	private Project myProject;
 
 	private ListManager mListManager;
-	public boolean proceed = true;
+    private JPanel myContentPanel;
 
-	@NotNull
+    @NotNull
 	private ListManager getListManager() {
 		return mListManager;
 	}
 
 
-	public SwitcherDialog(@NotNull final Project project) {
-		super(project);
-
+	private SwitcherDialog(@NotNull final Project project) {
 		myProject = project;
 
-		final Color listBackground = UIUtil.getListBackground();
-		centerPanel.setBackground(listBackground);
-		myBottomPanel.setBackground(listBackground);
-		myCenterPanel.setBackground(listBackground);
+		prepareUI();
 
 		TabGroupConfig config = TabSwitchExtremeConfigService.getInstance(project).getState();
 		String titles = config.getTitles();
@@ -61,7 +54,6 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 		final List<VirtualFile> openFileList = IJFileEditorUtils.getOpenFileList(project);
         // TODO: 18/9/29 这段逻辑放在外面
         if (openFileList.size() < 2) {
-			proceed = false; // hack to not show the dialog
 
 			return;
 		}
@@ -86,24 +78,64 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 		getListManager().mDesiredIndexInList = initialPos.getIndexInList();
 
-		path.setHorizontalAlignment(SwingConstants.RIGHT);
-		path.setFont(path.getFont().deriveFont((float) 10));
-
-		getListManager().insertIntoPanel(myCenterPanel, path);
+		getListManager().insertIntoPanel(myContentPanel, myFilePathLabel);
 
 		getListManager().setActiveListIndex(initialPos.getListIndex());
 		getListManager().getActiveList().setSelectedIndex(initialPos.getIndexInList());
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
-		init();
 	}
 
-    @Nullable
-	@Override
-	protected JComponent createCenterPanel() {
-		return centerPanel;
-	}
+
+	private void prepareUI() {
+        myContentPanel = new JPanel();
+        final Color listBackground = UIUtil.getListBackground();
+        myContentPanel.setBackground(listBackground);
+        myContentPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+        myFilePathLabel = new JLabel();
+        myFilePathLabel.setFont(myFilePathLabel.getFont().deriveFont((float) 10));
+
+        setContentPane(myContentPanel);
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                closeDialog();
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                super.windowLostFocus(e);
+                closeDialog();
+            }
+        });
+
+        myContentPanel.registerKeyboardAction(e -> closeDialog(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+
+    private void closeDialog() {
+        setVisible(false);
+        dispose();
+    }
+
+    public static void show(@NotNull final String title, @NotNull final Project project) {
+        SwitcherDialog dialog = new SwitcherDialog(project);
+        dialog.setTitle(title);
+        dialog.setResizable(false);
+        dialog.pack();
+
+        dialog.setLocationRelativeTo(null);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+    }
+
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -152,7 +184,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
 
-        close(0, true);
+        closeDialog();
 
         final VirtualFile file = getListManager().getSelectedFile();
         if (file == null || !file.isValid()) {

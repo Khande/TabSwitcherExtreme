@@ -123,32 +123,35 @@ public class ListManager {
 		return (VirtualFile) getActiveList().getSelectedValue();
 	}
 
-	public void insertIntoPanel(JPanel panel, JLabel pathLabel) {
-
-
-		int rows = 2; // header + list
-		int cols = getListCount() * 2 - 1; // separator between filenamelist
+	public void insertIntoPanel(@NotNull final JPanel panel, @NotNull final JLabel pathLabel) {
+        // header + list + file path label
+		int rows = 3;
+        int listCount = getListCount();
+        // separator between file name list
+        int cols = listCount * 2 - 1;
 
 		GridLayoutManager manager = new GridLayoutManager(rows, cols);
 		panel.setLayout(manager);
 
-		// add them in
-		for (int i = 0; i < getListCount(); i++) {
-			int rowNr = i;
+        GridConstraints pathLabelConstraints = new GridConstraints();
+        pathLabelConstraints.setRow(2);
+        pathLabelConstraints.setFill(GridConstraints.ALIGN_RIGHT);
+        panel.add(pathLabel, pathLabelConstraints);
+
+        for (int i = 0; i < listCount; i++) {
 
 			ListDescription desc = mListDescriptions.get(i);
 
-			// label
+			// title label
 			GridConstraints labelConstraints = new GridConstraints();
 			labelConstraints.setRow(0);
-			labelConstraints.setColumn(rowNr);
-
+			labelConstraints.setColumn(i);
 			panel.add(desc.getTitleLabel(), labelConstraints);
 
-			// list
+			// grouped file list
 			GridConstraints listConstraints = new GridConstraints();
 			listConstraints.setRow(1);
-			listConstraints.setColumn(rowNr);
+			listConstraints.setColumn(i);
 			listConstraints.setFill(GridConstraints.FILL_VERTICAL);
 			panel.add(desc.getList(), listConstraints);
 
