@@ -1,6 +1,6 @@
 <idea-plugin>
     <name>TabSwitcherExtreme</name>
-    <version>1.0.8</version>
+    <version>1.1.0</version>
     <idea-version since-build="99.18"/>
 
     <description><![CDATA[
@@ -46,10 +46,17 @@
         </action>
 
         <action
+                id="TabSwitcherExtreme.SwitchRecentlyEditedFilesAction"
+                class="org.intellij.ideaplugins.tabswitcherextreme.action.SwitchRecentlyEditedFilesAction"
+                text="Switch Recently Edited Files">
+            <keyboard-shortcut first-keystroke="shift ctrl T" keymap="$default"/>
+        </action>
+
+        <action
                 id="TabSwitcherExtreme.SwitchRecentTabsAction"
                 class="org.intellij.ideaplugins.tabswitcherextreme.action.SwitchRecentTabsAction"
                 text="Switch Recent Tabs">
-            <keyboard-shortcut first-keystroke="shift ctrl T" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="shift alt ctrl T" keymap="$default"/>
         </action>
 
     </actions>
