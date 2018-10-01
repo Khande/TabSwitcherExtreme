@@ -42,8 +42,16 @@
                 id="TabSwitcherExtreme.SwitchOpenedTabsAction"
                 class="org.intellij.ideaplugins.tabswitcherextreme.action.SwitchOpenedTabsAction"
                 text="Switch Opened Tabs">
-            <keyboard-shortcut first-keystroke="ctrl E" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="ctrl T" keymap="$default"/>
         </action>
+
+        <action
+                id="TabSwitcherExtreme.SwitchRecentTabsAction"
+                class="org.intellij.ideaplugins.tabswitcherextreme.action.SwitchRecentTabsAction"
+                text="Switch Recent Tabs">
+            <keyboard-shortcut first-keystroke="shift ctrl T" keymap="$default"/>
+        </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
