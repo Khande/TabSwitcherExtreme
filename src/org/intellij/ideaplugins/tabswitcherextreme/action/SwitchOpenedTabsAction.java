@@ -17,7 +17,11 @@ package org.intellij.ideaplugins.tabswitcherextreme.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.intellij.ideaplugins.tabswitcherextreme.SwitcherDialog;
+import org.intellij.ideaplugins.tabswitcherextreme.utils.IJFileEditorUtils;
+
+import java.util.List;
 
 public class SwitchOpenedTabsAction extends BaseSwitchTabAction {
 
@@ -29,8 +33,11 @@ public class SwitchOpenedTabsAction extends BaseSwitchTabAction {
             return;
         }
 
-		SwitcherDialog.show("Select File", project);
-
+        final List<VirtualFile> openFileList = IJFileEditorUtils.getOpenFileList(project);
+        boolean multipleFilesOpened = openFileList.size() > 1;
+        if (multipleFilesOpened) {
+            SwitcherDialog.show("Select File", project, openFileList);
+        }
     }
 
 }

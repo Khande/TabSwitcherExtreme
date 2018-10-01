@@ -28,13 +28,14 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 	private ListManager mListManager;
     private JPanel myContentPanel;
 
+
     @NotNull
 	private ListManager getListManager() {
 		return mListManager;
 	}
 
 
-	private SwitcherDialog(@NotNull final Project project) {
+	private SwitcherDialog(@NotNull final Project project, @NotNull final List<VirtualFile> filesToSwitch) {
         super(project);
 
 		myProject = project;
@@ -52,13 +53,6 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 		int validLen = Math.min(titleArr.length, matchArr.length);
 
-		final List<VirtualFile> openFileList = IJFileEditorUtils.getOpenFileList(project);
-        // TODO: 18/9/29 这段逻辑放在外面
-        if (openFileList.size() < 2) {
-
-			return;
-		}
-
         List<VirtualFile> recentFileList = IJFileEditorUtils.getHistoryFileList(project);
         mListManager = new ListManager(project, recentFileList);
 
@@ -71,7 +65,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 			getListManager().addListDescription(titleArr[i], matchArr[i], exclude);
 		}
 
-		getListManager().generateFileLists(openFileList);
+		getListManager().generateFileLists(filesToSwitch);
 
 		VirtualFile latestOpenFile = IJFileEditorUtils.getLatestOpenFile(project);
 
@@ -125,8 +119,9 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
 
 
-    public static void show(@NotNull final String title, @NotNull final Project project) {
-        SwitcherDialog dialog = new SwitcherDialog(project);
+    public static void show(@NotNull final String title, @NotNull final Project project,
+                            @NotNull final List<VirtualFile> filesToSwitch) {
+        SwitcherDialog dialog = new SwitcherDialog(project, filesToSwitch);
         dialog.setTitle(title);
         dialog.show();
     }
