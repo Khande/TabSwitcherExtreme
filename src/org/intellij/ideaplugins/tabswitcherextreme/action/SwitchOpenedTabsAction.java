@@ -36,7 +36,7 @@ public class SwitchOpenedTabsAction extends BaseSwitchTabAction {
         final List<VirtualFile> openFileList = IJFileEditorUtils.getOpenFileList(project);
         boolean multipleFilesOpened = openFileList.size() > 1;
         if (multipleFilesOpened) {
-            SwitcherDialog.show("Select File", project, openFileList);
+            SwitcherDialog.show("Select Opened File", project, openFileList);
         }
     }
 
