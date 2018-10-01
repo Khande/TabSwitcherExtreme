@@ -128,10 +128,8 @@ public class ListManager {
         // header + list + file path label
 		int rows = 3;
         int listCount = getListCount();
-        // separator between file name list
-        int cols = listCount * 2 - 1;
 
-		GridLayoutManager manager = new GridLayoutManager(rows, cols);
+		GridLayoutManager manager = new GridLayoutManager(rows, listCount);
 		panel.setLayout(manager);
 
         GridConstraints pathLabelConstraints = new GridConstraints();

@@ -110,6 +110,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
     private void prepareUI() {
         myContentPanel = new JPanel();
+        myContentPanel.setBorder(this.createContentPaneBorder());
         final Color listBackground = UIUtil.getListBackground();
         myContentPanel.setBackground(listBackground);
 
