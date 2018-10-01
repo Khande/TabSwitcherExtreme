@@ -13,11 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
@@ -110,6 +107,13 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
         return new Action[0];
     }
 
+
+    @Override
+    protected void dispose() {
+        super.dispose();
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
+    }
+
     private void prepareUI() {
         myContentPanel = new JPanel();
         final Color listBackground = UIUtil.getListBackground();
@@ -165,6 +169,9 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
             case KeyEvent.VK_ENTER:
                 openFile();
                 break;
+            case KeyEvent.VK_ESCAPE:
+                close(CLOSE_EXIT_CODE);
+                break;
             default:
                 break;
         }
@@ -173,9 +180,7 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
 
     private void openFile() {
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);
-
-        close(OK_EXIT_CODE, true);
+        close(OK_EXIT_CODE);
 
         final VirtualFile file = getListManager().getSelectedFile();
         if (file == null || !file.isValid()) {
