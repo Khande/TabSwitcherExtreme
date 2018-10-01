@@ -98,6 +98,12 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
         return myContentPanel;
     }
 
+    @Nullable
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return myContentPanel;
+    }
+
     @NotNull
     @Override
     protected Action[] createActions() {
