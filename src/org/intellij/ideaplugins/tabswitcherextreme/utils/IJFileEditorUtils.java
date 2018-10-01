@@ -1,9 +1,11 @@
 package org.intellij.ideaplugins.tabswitcherextreme.utils;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.fileEditor.impl.EditorHistoryManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +56,13 @@ public final class IJFileEditorUtils {
         // if the file occurs several times in the history, only its last occurrence counts
         LinkedHashSet<VirtualFile> fileSet = editorHistoryManager.getFileSet();
         return new ArrayList<>(fileSet);
+    }
+
+
+    @NotNull
+    public static List<VirtualFile> getRecentlyEditedFileList(@NotNull final Project project) {
+        VirtualFile[] changedFiles = IdeDocumentHistory.getInstance(project).getChangedFiles();
+        return ContainerUtil.addAll(new ArrayList<>(changedFiles.length), changedFiles);
     }
 
 
