@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vcs.FileStatus;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -13,6 +14,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.util.IconUtil;
+import com.intellij.util.ObjectUtils;
 import org.apache.http.util.TextUtils;
 import org.intellij.ideaplugins.tabswitcherextreme.utils.IJCollectionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -47,42 +49,41 @@ public class ListManager {
 	}
 
 
-	public void generateFileLists(List<VirtualFile> allFiles) {
+	public void generateFileLists(List<VirtualFile> filesToSwitch) {
 		// copy the list, and if found one, remove from shadowlist. If any left, make a new list with leftovers
-		allFiles.sort(Comparator.comparing(VirtualFile::getName));
+		filesToSwitch.sort(Comparator.comparing(VirtualFile::getName));
 
-		List<VirtualFile> controlList = new ArrayList<>(allFiles.size());
-		controlList.addAll(allFiles);
-		List<String> controlListStrings = new ArrayList<>(allFiles.size());
+		int totalSwitchSize = filesToSwitch.size();
+		List<VirtualFile> controlList = new ArrayList<>(filesToSwitch);
+
+		List<String> controlListStrings = new ArrayList<>(totalSwitchSize);
 		for (VirtualFile f : controlList) {
 			controlListStrings.add(f.getPath());
 		}
 
-		List<ListDescription> removeList = new ArrayList<ListDescription>();
+		List<ListDescription> removeList = new ArrayList<>();
 
 		for (ListDescription desc : mListDescriptions) {
-			List<VirtualFile> filtered = new ArrayList<VirtualFile>();
-			for (VirtualFile f : allFiles) {
-				String filename = f.getPath();
+			List<VirtualFile> groupedFileList = new ArrayList<>();
+			for (VirtualFile file : filesToSwitch) {
+				String filePath = file.getPath();
 				// don't keep doubles
-				if (controlListStrings.contains(filename)) {
-					if (filename.matches(desc.myMatch)) {
-						filtered.add(f);
-						controlList.remove(f);
-						controlListStrings.remove(filename);
+				if (controlListStrings.contains(filePath)) {
+					if (filePath.matches(desc.myMatch)) {
+						groupedFileList.add(file);
+						controlList.remove(file);
+						controlListStrings.remove(filePath);
 					}
 				}
 			}
-			if (filtered.isEmpty()) {
+			if (groupedFileList.isEmpty()) {
 				removeList.add(desc);
 			} else {
-				desc.setGroupedFileList(filtered);
+				desc.setGroupedFileList(groupedFileList);
 			}
 		}
 
-		for (ListDescription desc : removeList) {
-			mListDescriptions.remove(desc);
-		}
+		mListDescriptions.removeAll(removeList);
 
 		// check if we have some lost souls
 		if (!controlList.isEmpty()) {
@@ -135,7 +136,8 @@ public class ListManager {
 
         GridConstraints pathLabelConstraints = new GridConstraints();
         pathLabelConstraints.setRow(2);
-        pathLabelConstraints.setFill(GridConstraints.ALIGN_RIGHT);
+        pathLabelConstraints.setFill(GridConstraints.FILL_HORIZONTAL);
+        pathLabelConstraints.setAnchor(GridConstraints.ALIGN_RIGHT);
         panel.add(pathLabel, pathLabelConstraints);
 
         for (int i = 0; i < listCount; i++) {
@@ -159,54 +161,69 @@ public class ListManager {
 		}
 	}
 
-	private void setListData(ListManager.ListDescription desc, final List<VirtualFile> filtered, JLabel pathLabel) {
+	private void setListData(ListManager.ListDescription desc, final List<VirtualFile> groupedFileList, JLabel pathLabel) {
 		desc.mList.setModel(new AbstractListModel() {
 			public int getSize() {
-				return filtered.size();
+				return groupedFileList.size();
 			}
 
 			public Object getElementAt(int index) {
-				return filtered.get(index);
+				return groupedFileList.get(index);
 			}
 		});
 
 		desc.mList.setCellRenderer(getRenderer(mProject));
 		desc.mList.getSelectionModel().addListSelectionListener(getListener(desc.mList, pathLabel));
-		desc.mList.setVisibleRowCount(filtered.size());
+		desc.mList.setVisibleRowCount(groupedFileList.size());
 	}
+
 
 	private static ListSelectionListener getListener(final JList list, final JLabel path) {
 		return new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent event) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						updatePath(list, path);
-					}
-				});
+				SwingUtilities.invokeLater(() -> updatePathLabel(list, path));
 			}
+
+			private void updatePathLabel(@NotNull final JList list, @NotNull final JLabel pathLabel) {
+				String pathLabelText = " ";
+
+				List values = list.getSelectedValuesList();
+				if (!IJCollectionUtils.isNullOrEmpty(values)) {
+					VirtualFile file = (VirtualFile) values.get(0);
+					String presentableUrl = ObjectUtils.notNull(file.getParent(), file).getPresentableUrl();
+					pathLabelText = FileUtil.getLocationRelativeToUserHome(presentableUrl);
+
+					pathLabelText = getTitle2Text(pathLabelText, pathLabel);
+				}
+
+				pathLabel.setText(pathLabelText);
+			}
+
+			@NotNull
+			private String getTitle2Text(@Nullable String fullText, @NotNull JLabel pathLabel) {
+				if (fullText == null || fullText.length() == 0) {
+					return " ";
+				}
+
+				int labelWidth = pathLabel.getWidth();
+				final FontMetrics fontMetrics = pathLabel.getFontMetrics(pathLabel.getFont());
+				while (fontMetrics.stringWidth(fullText) > labelWidth) {
+					int sep = fullText.indexOf(File.separatorChar, 4);
+					if (sep < 0) return fullText;
+					fullText = "..." + fullText.substring(sep);
+				}
+				return fullText;
+			}
+
 		};
 	}
-	private static void updatePath(JList list, JLabel path) {
-		String text = " ";
-		final Object[] values = list.getSelectedValues();
-		if ((values != null) && (values.length == 1)) {
-			final VirtualFile parent = ((VirtualFile) values[0]).getParent();
-			if (parent != null) {
-				text = parent.getPresentableUrl();
-				final FontMetrics metrics = path.getFontMetrics(path.getFont());
-				while ((metrics.stringWidth(text) > path.getWidth()) &&
-					(text.indexOf(File.separatorChar, 4) > 0)) {
-					text = "..." + text.substring(text.indexOf(File.separatorChar, 4));
-				}
-			}
-		}
-		path.setText(text);
-	}
+
+
 
 	private static ListCellRenderer getRenderer(final Project project) {
 		return new ColoredListCellRenderer() {
 			@Override
-			protected void customizeCellRenderer(JList list, Object value, int index,
+			protected void customizeCellRenderer(@NotNull JList list, Object value, int index,
 												 boolean selected, boolean hasFocus) {
 				if (value instanceof VirtualFile) {
 					final VirtualFile file = (VirtualFile) value;
@@ -218,9 +235,9 @@ public class ListManager {
 							EffectType.LINE_UNDERSCORE, Font.PLAIN);
 
 					String filename = file.getName();
-					String remover = (( ListDescription.JMyList) list).exclude;
-					if (null != remover) {
-						filename = filename.replaceAll(remover, "");
+					String exclude = (( ListDescription.JMyList) list).exclude;
+					if (null != exclude) {
+						filename = filename.replaceAll(exclude, "");
 					}
 
 					append(filename, SimpleTextAttributes.fromTextAttributes(attributes));
