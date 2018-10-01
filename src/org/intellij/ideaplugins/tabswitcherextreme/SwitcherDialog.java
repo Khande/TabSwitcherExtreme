@@ -98,6 +98,11 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
         return myContentPanel;
     }
 
+    @NotNull
+    @Override
+    protected Action[] createActions() {
+        return new Action[0];
+    }
 
     private void prepareUI() {
         myContentPanel = new JPanel();
