@@ -149,15 +149,19 @@ public class SwitcherDialog extends DialogWrapper implements KeyEventDispatcher{
                     getListManager().updateSelection(ListManager.NavigateCommand.TAB);
                 }
             case KeyEvent.VK_UP:
+            case KeyEvent.VK_K:
                 getListManager().updateSelection(ListManager.NavigateCommand.UP);
                 break;
             case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_J:
                 getListManager().updateSelection(ListManager.NavigateCommand.DOWN);
                 break;
             case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_L:
                 getListManager().updateSelection(ListManager.NavigateCommand.RIGHT);
                 break;
             case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_H:
                 getListManager().updateSelection(ListManager.NavigateCommand.LEFT);
                 break;
             case KeyEvent.VK_PAGE_UP:
