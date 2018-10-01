@@ -440,7 +440,7 @@ public class ListManager {
 				List<VirtualFile> filteredFileList = mListDescriptions.get(i).getGroupedFileList();
 
 				int index = filteredFileList.indexOf(file);
-				if (index > 0) {
+				if (index >= 0) {
 					foundListIndex = i;
 					foundIndexInList = index;
 					break;
