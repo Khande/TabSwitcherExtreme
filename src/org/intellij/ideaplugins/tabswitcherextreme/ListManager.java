@@ -306,16 +306,18 @@ public class ListManager {
 			return;
 		}
 
-		JList nextList = getListFromIndex(targetFilePosition.getListIndex());
+        final int targetListIndex = targetFilePosition.getListIndex();
+        if (targetListIndex != previousListIndex ) {
+            setActiveListIndex(targetListIndex);
+            // clear the previous one
+            previousList.clearSelection();
+        }
+
+		JList nextList = getListFromIndex(targetListIndex);
 		int nextIndexInList = targetFilePosition.getIndexInList();
 		nextList.setSelectedIndex(nextIndexInList);
 		nextList.ensureIndexIsVisible(nextIndexInList);
 
-		if (targetFilePosition.getListIndex() != previousListIndex ) {
-			setActiveListIndex(targetFilePosition.getListIndex());
-			// clear the previous one
-			previousList.clearSelection();
-		}
 	}
 
 	@Nullable
